@@ -25,6 +25,8 @@ npx skills add ravi2799/ai-agent-skills --skill prompt-engineer
 | [guardrails](skills/guardrails/) | Add safety rails, input validation, and output checks to agents |
 | [skill-creator](skills/skill-creator/) | Write new SKILL.md files that follow best practices |
 | [model-gateway](skills/model-gateway/) | Configure and call LLMs through OpenRouter, LiteLLM, or direct APIs |
+| [agent-builder](skills/agent-builder/) | Meta-skill — orchestrates the full agent build lifecycle end-to-end |
+| [langgraph-orchestrator](skills/langgraph-orchestrator/) | Build stateful workflows with LangGraph — state machines, cycles, human-in-the-loop |
 
 ## What Are Skills?
 
