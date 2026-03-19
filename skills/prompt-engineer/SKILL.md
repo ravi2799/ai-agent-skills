@@ -8,7 +8,7 @@ description: >
   "make this prompt better", "fix this prompt", "review this prompt",
   "is this a good prompt", "evaluate this prompt", or any task where the agent
   is about to write or edit a prompt string in code, config, or instructions.
-  This skill enforces Anthropic prompting best practices as mandatory rules
+  This skill enforces proven prompting best practices as mandatory rules
   for all prompt operations.
 ---
 
@@ -27,7 +27,7 @@ Identify which operation applies, then follow the corresponding section below be
 Before writing a single word, verify:
 
 - [ ] I understand the **task type** (coding, analysis, writing, classification, conversation, etc.)
-- [ ] I know the **target model** and context (Claude Code, API, chat interface)
+- [ ] I know the **target model** and context (AI coding agent, API, chat interface)
 - [ ] I know the **expected output format** (prose, JSON, code, list, etc.)
 - [ ] I know if **examples** are needed or available
 - [ ] I know if a **role** would help focus the model's behavior
@@ -140,7 +140,7 @@ You are a customer support assistant. When the user provides a customer email:
 ---
 
 ### 2. Provide Context and Motivation
-- When adding a constraint, include **why** it matters so Claude can generalize
+- When adding a constraint, include **why** it matters so the model can generalize
 - Don't just say what to avoid — explain the downstream reason
 
 **Before:** `Never use bullet points`
@@ -188,7 +188,7 @@ You are a customer support assistant. When the user provides a customer email:
 
 ---
 
-### 6. Give Claude a Specific Role (When Relevant)
+### 6. Give the Model a Specific Role (When Relevant)
 - Open the system prompt with a role sentence when domain expertise helps
 - Keep roles specific to the task — generic filler adds little
 
@@ -197,7 +197,7 @@ You are a customer support assistant. When the user provides a customer email:
 
 ---
 
-### 7. Tell Claude What To Do, Not What To Avoid
+### 7. Tell the Model What To Do, Not What To Avoid
 
 | Avoid | Prefer |
 |---|---|
@@ -241,5 +241,4 @@ After creating, modifying, or evaluating a prompt, confirm:
 
 ## Reference
 
-This skill applies Anthropic's official prompting best practices. For deep reference on specific techniques (few-shot examples, long-context structuring, thinking/reasoning prompts, tool use instructions), see:
-- https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/overview
+This skill applies proven prompting best practices drawn from industry research and official provider documentation. For deep reference on specific techniques (few-shot examples, long-context structuring, thinking/reasoning prompts, tool use instructions), consult your model provider's prompt engineering guide.
