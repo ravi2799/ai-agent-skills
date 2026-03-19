@@ -150,7 +150,33 @@ Structure how data appears in the context window. Order matters — information 
 - Place the task description and key facts FIRST — the agent needs to know what it's solving before seeing data
 - Place most critical data immediately after the task
 - Place supporting data later
-- Long documents go at the TOP (before instructions) for long-context models, or use document tags
+- Long documents go at the TOP (before instructions) for long-context models
+
+**Document tag pattern — for long documents in context:**
+
+When loading large documents, wrap them in structured tags so the model can identify source and boundaries:
+
+```xml
+<document>
+  <source>sip_log.txt (filtered to REGISTER/INVITE only)</source>
+  <document_content>
+    [file content here]
+  </document_content>
+</document>
+
+<document>
+  <source>probe_log.txt (deduplicated, 1,446 entries)</source>
+  <document_content>
+    [file content here]
+  </document_content>
+</document>
+```
+
+This helps the model cite specific sources and distinguish between multiple documents in context. Instruct the agent to **quote relevant sections before reasoning** — this improves grounding and reduces hallucination.
+
+**MCP as context source:**
+
+If the project uses Model Context Protocol (MCP) servers, context can be loaded dynamically from external sources (databases, APIs, file systems) at runtime. Treat MCP tool results the same as loaded files — they consume context budget and should be filtered/transformed before use.
 
 ---
 
@@ -359,6 +385,18 @@ Main agent: synthesizes sub-agent summaries into final answer
 ```
 
 Each sub-agent gets a clean context window for deep analysis. The main agent only sees condensed summaries.
+
+### Choosing the Right Technique
+
+| Task Type | Best Technique | Why |
+|---|---|---|
+| **Extensive back-and-forth** (debugging, Q&A) | **Compaction** | Conversation grows linearly, compress older turns |
+| **Iterative development with milestones** (build, test, fix) | **Note-taking** | Track progress across steps, recall decisions |
+| **Complex research / parallel exploration** | **Sub-agents** | Each source gets full context, main agent synthesizes |
+| **Large dataset, unpredictable queries** | **Progressive disclosure** | Load metadata upfront, fetch details on demand |
+| **Small dataset, single task** | **Full load** | Everything fits — don't over-engineer |
+
+**Start with the simplest technique that works.** Full load → filtered load → progressive disclosure → sub-agents. Escalate only when simpler approaches hit limits.
 
 ---
 

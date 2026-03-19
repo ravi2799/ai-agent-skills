@@ -122,6 +122,18 @@ When asked to review or evaluate a prompt, score it against each dimension below
 
 ## Core Rules (Apply to All Operations)
 
+### 0. Find the Right Altitude
+
+Every prompt exists on a spectrum between two failure modes:
+
+| Too Specific (brittle) | Right Altitude | Too Vague (useless) |
+|---|---|---|
+| Hardcoded logic for every case | Strong heuristics that generalize | "Do your best" |
+| Breaks when input varies slightly | Handles edge cases via principles | Assumes shared context that doesn't exist |
+| Maintenance nightmare | Specific enough to guide, flexible enough to adapt | Agent guesses what you want |
+
+**Test:** If changing one word in the input breaks the prompt, it's too specific. If a new team member can't figure out what to do from the prompt alone, it's too vague.
+
 ### 1. Be Clear and Direct
 - Use **explicit, specific language** — never rely on vague phrases like "do your best" or "try to"
 - State the desired output format and constraints directly
