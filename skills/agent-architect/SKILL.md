@@ -18,11 +18,22 @@ Identify which operation applies, then follow the corresponding section.
 
 ## Operation: DESIGN — Designing an Agent System
 
+### Required Input from Previous Phases
+
+If `data-scientist` (Phase 0) and `context-engineer` (Phase 0.5) have run, use their output:
+
+- **Problem Statement** — from `data-scientist` (what we're solving, who needs it, what success looks like)
+- **Data Profile** — from `data-scientist` (what data exists, what's signal vs noise)
+- **Context Spec** — from `context-engineer` (how data loads into context, token budget, loading strategy)
+
+**Do not re-discover what Phase 0 already answered.** The problem statement IS your starting point — design the agent to solve THAT problem with THAT data.
+
 ### Pre-Design Checklist
 
 Before proposing any architecture, verify:
 
-- [ ] I understand the **end-to-end task** the system must accomplish
+- [ ] I have the **problem statement** from `data-scientist` (or directly from the user)
+- [ ] I have the **context spec** from `context-engineer` (if data is involved)
 - [ ] I have considered whether a **single agent** can handle it (start here)
 - [ ] I know the **tools** available or needed
 - [ ] I know the **input/output contract** — what goes in, what comes out

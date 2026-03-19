@@ -19,21 +19,24 @@ The **conductor skill** — orchestrates the full agent build lifecycle from ide
 
 ## The Build Lifecycle
 
-Every agent build follows these 9 phases in order. Do not skip phases — each one depends on the previous.
+Every agent build follows these 10 phases in order. Do not skip phases — each one depends on the previous.
 
 ```
-Phase 0:   DATA-ANALYST      → Understand the data before anything else
+Phase 0:   DATA-SCIENTIST    → Understand the problem and the data
 Phase 0.5: CONTEXT-ENGINEER  → Build loading strategy to fill context optimally
-Phase 1:   PLAN              → What does this agent need to do?
+Phase 1:   PLAN              → Design the agent architecture
 Phase 2:   MODEL             → Configure LLM access
 Phase 3:   TOOLS             → Design the capabilities it needs
 Phase 4:   PROMPT            → Write the system prompt
 Phase 5:   GUARD             → Add safety rails
 Phase 6:   EVAL              → Build tests to verify it works
+Phase 6.5: ITERATE           → Run tests, diagnose failures, fix, repeat
 Phase 7:   SHIP              → Package and deploy
 ```
 
 **Phase 0 and 0.5 are mandatory when the agent works with user-provided data.** Skip them only if the agent has no data inputs (e.g., a pure conversational agent).
+
+**Phase 6.5 is mandatory.** Never ship without passing all eval tests.
 
 ### Decision Point: Simple vs Complex
 
@@ -253,6 +256,41 @@ Method: [exact_match / schema_validation / llm_judge / human]
 
 ---
 
+## Phase 6.5: ITERATE — Fix What's Broken
+
+**Do not ship until the agent passes all eval tests.** This phase loops until quality is met.
+
+### The Iteration Loop
+
+```
+RUN EVALS → DIAGNOSE FAILURES → FIX → RE-RUN EVALS → REPEAT
+```
+
+### Diagnosing Failures
+
+For each failing test case, identify the root cause:
+
+| Symptom | Root Cause | Fix Using |
+|---|---|---|
+| Agent misunderstands the task | Prompt is unclear or ambiguous | `prompt-engineer` — rewrite instructions |
+| Agent calls wrong tool | Tool descriptions overlap or are vague | `tool-designer` — improve descriptions |
+| Agent produces wrong format | Output format not specified or enforced | `prompt-engineer` — add structured output pattern |
+| Agent misses data in context | Critical data not loaded or buried | `context-engineer` — adjust loading priority/layout |
+| Agent loops or gets stuck | Missing guardrails or unclear stopping condition | `guardrails` — add circuit breaker |
+| Agent hallucinates facts | Context doesn't contain the answer, agent guesses | `prompt-engineer` — add "say I don't know" rule |
+| Agent output is right but slow | Wrong model or too much context | `model-gateway` — switch model or trim context |
+
+### Rules
+
+- Fix **one thing at a time** — change prompt OR tool OR context, not all at once
+- Re-run **all** tests after each fix, not just the failing one (check for regressions)
+- Track what you changed and why (keep a changelog)
+- If 3+ iterations don't fix a test, reconsider the architecture (`agent-architect`)
+
+### Checkpoint: All eval tests pass? → Proceed to SHIP
+
+---
+
 ## Phase 7: SHIP — Package and Deploy
 
 ### For a Standalone Agent
@@ -296,14 +334,15 @@ When building an agent, these skills are called in order:
 
 | Phase | Skill Called | What It Does |
 |---|---|---|
-| 0. Data | `data-analyst` | Understand the data before building |
+| 0. Data | `data-scientist` | Understand the problem and data |
 | 0.5. Context | `context-engineer` | Build loading strategy for optimal context |
 | 1. Plan | `agent-architect` | Design the agent system |
 | 2. Model | `model-gateway` | Configure LLM calls |
 | 3. Tools | `tool-designer` | Create tool definitions |
-| 4. Prompt | `prompt-engineer` | Write the system prompt |
+| 4. Prompt | `prompt-engineer` | Write the system prompt (informed by context spec) |
 | 5. Guard | `guardrails` | Add safety rails |
 | 6. Eval | `eval-designer` | Build test cases |
+| 6.5. Iterate | all skills | Run tests → diagnose → fix → re-run until passing |
 | 7. Ship | `skill-creator` | Package for distribution |
 
 For complex multi-agent systems, also use:

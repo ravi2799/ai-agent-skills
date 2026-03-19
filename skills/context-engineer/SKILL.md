@@ -12,7 +12,7 @@ description: >
 
 # Context Engineer Skill
 
-The **Phase 0.5 skill** — takes the output from `data-analyst` and builds the actual loading strategy, scripts, and transformations that fill the agent's context window with maximum signal.
+The **Phase 0.5 skill** — takes the output from `data-scientist` and builds the actual loading strategy, scripts, and transformations that fill the agent's context window with maximum signal.
 
 **Context engineering is not prompt engineering.** Prompt engineering is about *what you tell the agent to do*. Context engineering is about *what the agent sees when it starts working*.
 
@@ -59,7 +59,7 @@ Example (200K context model):
 
 ### Input Required
 
-This skill requires the output from `data-analyst` — specifically:
+This skill requires the output from `data-scientist` — specifically:
 - File inventory with sizes and token estimates
 - Data profiles showing structure and content
 - Signal vs noise classification per file
@@ -420,5 +420,5 @@ The final deliverable is a spec that the builder agent uses:
 - Ignore token costs ("it's a big context window, it'll be fine")
 - Load binary files directly into text context
 - Assume more data means better results (context rot is real)
-- Build context strategies without first running `data-analyst`
+- Build context strategies without first running `data-scientist`
 - Hardcode file paths instead of building reusable loading scripts

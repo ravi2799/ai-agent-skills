@@ -1,29 +1,62 @@
 ---
-name: data-analyst
+name: data-scientist
 description: >
   Use this skill before building any agent that works with data. Triggers
-  include "analyze this data", "what's in this folder", "understand the data
-  first", "do EDA", "profile this dataset", "what data do I have", "what
-  format is this", or any task where you need to understand raw data before
-  designing an agent or solution. This is always Phase 0 — understand
-  before you build.
+  include "analyze this data", "what's in this folder", "understand the
+  problem", "understand the data first", "do EDA", "profile this dataset",
+  "what data do I have", "what are we solving", "define the problem", or
+  any task where you need to understand the problem and raw data before
+  designing an agent or solution. This is always Phase 0.
 ---
 
-# Data Analyst Skill
+# Data Scientist Skill
 
-The **Phase 0 skill** — understand the data before writing a single line of agent code. This is what every good engineer does before solving a problem.
+The **Phase 0 skill** — understand the problem AND the data before writing a single line of agent code. This is what every good engineer does before solving a problem.
 
-**Rule: Never build an agent without first understanding the data it will work with.**
+**Rule: Never build an agent without first understanding what you're solving and what data you have.**
 
 ---
 
 ## The Analysis Pipeline
 
 ```
-DISCOVER → PROFILE → ASSESS → MAP → RECOMMEND
+DEFINE PROBLEM → DISCOVER → PROFILE → ASSESS → MAP → RECOMMEND
 ```
 
-Follow these phases in order. Each phase produces output that feeds the next.
+Follow these phases in order. Each phase produces output that feeds the next. Every phase after Problem Definition is viewed through the lens of **"does this help solve the problem?"**
+
+---
+
+## Phase 0: DEFINE PROBLEM — What Are We Solving?
+
+Before touching any data, understand the problem completely. This frames everything that follows.
+
+### Mandatory Questions (Answer All)
+
+1. **What is the problem?** — Describe in one sentence what needs to be solved
+2. **Who needs it solved?** — Who is the end user and what do they care about?
+3. **What does success look like?** — What output would solve the problem?
+4. **What decisions will be made?** — How will the output be used?
+5. **What domain is this?** — What expertise is needed to interpret the data?
+6. **What constraints exist?** — Time, accuracy requirements, output format, etc.
+
+### Output: Problem Statement
+
+```
+## Problem Statement
+
+**Problem:** [one sentence — what needs to be solved]
+**User:** [who needs this and why]
+**Success:** [what the output looks like when the problem is solved]
+**Domain:** [what expertise is needed]
+**Constraints:** [accuracy, format, speed, etc.]
+**Key questions the data must answer:**
+1. [most important question]
+2. [second question]
+3. [third question]
+```
+
+**This problem statement guides every subsequent phase.** When profiling data, you're asking "does this field help answer my key questions?" When assessing quality, you're asking "will this issue prevent me from solving the problem?" When mapping signal vs noise, the problem statement IS the filter.
 
 ---
 

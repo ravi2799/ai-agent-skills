@@ -26,11 +26,15 @@ Identify which operation applies, then follow the corresponding section below be
 
 Before writing a single word, verify:
 
+- [ ] I have the **problem statement** from `data-scientist` (if available)
+- [ ] I know the **context layout** from `context-engineer` — what data the agent will see in its context window, so the prompt can reference it correctly
 - [ ] I understand the **task type** (coding, analysis, writing, classification, conversation, etc.)
 - [ ] I know the **target model** and context (AI coding agent, API, chat interface)
 - [ ] I know the **expected output format** (prose, JSON, code, list, etc.)
 - [ ] I know if **examples** are needed or available
 - [ ] I know if a **role** would help focus the model's behavior
+
+**The prompt must be written WITH KNOWLEDGE of what's in the context window.** If `context-engineer` loads SIP logs and probe logs in a specific layout, the prompt should tell the agent how to use that data — not just what to do in the abstract.
 
 If any item is unclear, ask the user before writing.
 
@@ -185,6 +189,58 @@ You are a customer support assistant. When the user provides a customer email:
 - Use positive framing:
   - ❌ `Do not use markdown`
   - ✅ `Write your response as plain prose paragraphs with no markdown formatting`
+
+#### Structured Output (When Code Consumes the Response)
+
+When agent output must be parsed by code (not read by humans), use these patterns:
+
+**Pattern A — JSON Mode**
+Tell the model to output JSON and specify the exact schema:
+```
+Respond with a JSON object matching this exact schema:
+{
+  "verdict": "pass" | "fail",
+  "confidence": 0.0 to 1.0,
+  "reason": "string explaining the verdict"
+}
+Output ONLY the JSON object, no other text.
+```
+
+**Pattern B — Structured Sections with Markers**
+Use clear delimiters the parser can find:
+```
+Output your analysis in this exact format:
+
+VERDICT: [pass/fail]
+CONFIDENCE: [0.0-1.0]
+REASON: [one sentence]
+DETAILS: [detailed explanation]
+```
+
+**Pattern C — Pydantic Output Parser (LangChain)**
+```python
+from langchain_core.output_parsers import PydanticOutputParser
+from pydantic import BaseModel, Field
+
+class Verdict(BaseModel):
+    verdict: str = Field(description="pass or fail")
+    confidence: float = Field(description="0.0 to 1.0")
+    reason: str = Field(description="one sentence explanation")
+
+parser = PydanticOutputParser(pydantic_object=Verdict)
+prompt = prompt_template + "\n" + parser.get_format_instructions()
+chain = prompt | llm | parser  # auto-parses to Verdict object
+```
+
+**Pattern D — Retry on Parse Failure**
+```python
+from langchain.output_parsers import RetryOutputParser
+
+retry_parser = RetryOutputParser.from_llm(parser=parser, llm=llm)
+# Automatically re-prompts the model if output doesn't parse
+```
+
+**Rule:** If the output feeds code, always validate it. If validation fails, retry with the parse error as feedback — do not silently accept malformed output.
 
 ---
 
