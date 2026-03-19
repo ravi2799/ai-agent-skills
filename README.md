@@ -2,15 +2,29 @@
 
 A curated collection of provider-agnostic skills for AI agents. These skills work with any AI coding assistant or agent framework — Claude Code, Cursor, Windsurf, Cline, Aider, and more.
 
-## What Are Skills?
+## Quick Install
 
-Skills are structured instruction sets that give AI agents specialized capabilities. Each skill defines **when** it should activate, **what rules** to follow, and **how** to produce consistent, high-quality output for a specific task domain.
+Install all skills:
+```bash
+npx skills add ravi2799/ai-agent-skills
+```
+
+Install a specific skill:
+```bash
+npx skills add ravi2799/ai-agent-skills --skill prompt-engineer
+```
 
 ## Available Skills
 
 | Skill | Description |
 |---|---|
 | [prompt-engineer](skills/prompt-engineer/) | Create, modify, and evaluate prompts using proven best practices |
+
+## What Are Skills?
+
+Skills are structured instruction sets that give AI agents specialized capabilities. Each skill defines **when** it should activate, **what rules** to follow, and **how** to produce consistent, high-quality output for a specific task domain.
+
+Compatible with the [skills CLI](https://skills.sh) from [vercel-labs/skills](https://github.com/vercel-labs/skills).
 
 ## Repository Structure
 
@@ -23,10 +37,9 @@ ai-agent-skills/
       SKILL.md
 ```
 
-## How to Use
+## Manual Installation
 
 ### Claude Code
-Copy the skill folder into `~/.claude/skills/` for global access:
 ```bash
 cp -r skills/<skill-name> ~/.claude/skills/
 ```
