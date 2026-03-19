@@ -1,6 +1,6 @@
 # AI Agent Skills
 
-A curated collection of provider-agnostic skills for AI agents. These skills work with any AI coding assistant or agent framework — Claude Code, Cursor, Windsurf, Cline, Aider, and more.
+Skills that help AI agents build better AI agents — prompt engineering, architecture, evaluation, guardrails, and more. Provider-agnostic, works with any AI coding assistant or agent framework.
 
 ## Quick Install
 
@@ -19,6 +19,11 @@ npx skills add ravi2799/ai-agent-skills --skill prompt-engineer
 | Skill | Description |
 |---|---|
 | [prompt-engineer](skills/prompt-engineer/) | Create, modify, and evaluate prompts using proven best practices |
+| [agent-architect](skills/agent-architect/) | Design, review, and debug multi-agent systems |
+| [tool-designer](skills/tool-designer/) | Create, review, and convert tool/function definitions for agents |
+| [eval-designer](skills/eval-designer/) | Build evaluation frameworks to measure agent quality |
+| [guardrails](skills/guardrails/) | Add safety rails, input validation, and output checks to agents |
+| [skill-creator](skills/skill-creator/) | Write new SKILL.md files that follow best practices |
 
 ## What Are Skills?
 
