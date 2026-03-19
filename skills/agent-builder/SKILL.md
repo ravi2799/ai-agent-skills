@@ -19,17 +19,21 @@ The **conductor skill** — orchestrates the full agent build lifecycle from ide
 
 ## The Build Lifecycle
 
-Every agent build follows these 7 phases in order. Do not skip phases — each one depends on the previous.
+Every agent build follows these 9 phases in order. Do not skip phases — each one depends on the previous.
 
 ```
-Phase 1: PLAN       → What does this agent need to do?
-Phase 2: MODEL      → Configure LLM access
-Phase 3: TOOLS      → Design the capabilities it needs
-Phase 4: PROMPT     → Write the system prompt
-Phase 5: GUARD      → Add safety rails
-Phase 6: EVAL       → Build tests to verify it works
-Phase 7: SHIP       → Package and deploy
+Phase 0:   DATA-ANALYST      → Understand the data before anything else
+Phase 0.5: CONTEXT-ENGINEER  → Build loading strategy to fill context optimally
+Phase 1:   PLAN              → What does this agent need to do?
+Phase 2:   MODEL             → Configure LLM access
+Phase 3:   TOOLS             → Design the capabilities it needs
+Phase 4:   PROMPT            → Write the system prompt
+Phase 5:   GUARD             → Add safety rails
+Phase 6:   EVAL              → Build tests to verify it works
+Phase 7:   SHIP              → Package and deploy
 ```
+
+**Phase 0 and 0.5 are mandatory when the agent works with user-provided data.** Skip them only if the agent has no data inputs (e.g., a pure conversational agent).
 
 ### Decision Point: Simple vs Complex
 
@@ -292,6 +296,8 @@ When building an agent, these skills are called in order:
 
 | Phase | Skill Called | What It Does |
 |---|---|---|
+| 0. Data | `data-analyst` | Understand the data before building |
+| 0.5. Context | `context-engineer` | Build loading strategy for optimal context |
 | 1. Plan | `agent-architect` | Design the agent system |
 | 2. Model | `model-gateway` | Configure LLM calls |
 | 3. Tools | `tool-designer` | Create tool definitions |
