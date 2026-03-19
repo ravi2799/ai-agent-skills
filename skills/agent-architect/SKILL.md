@@ -41,25 +41,42 @@ A single agent with good tools solves most problems. Add agents only when:
 
 If none of these apply, use one agent.
 
-### Rule 2 — Each Agent Gets One Job
+### Rule 2 — One Task, One Agent (Critical for Accuracy)
+
+**An agent that does one thing does it well. An agent that does many things does all of them poorly.**
+
+Splitting responsibilities into single-task agents dramatically improves accuracy because:
+- The agent's full context window focuses on one objective
+- Tool selection is unambiguous — fewer tools means fewer wrong choices
+- Prompts stay short and specific — no competing instructions
+- Failures are isolated — one agent failing does not corrupt another's work
+- Evaluation is straightforward — test one behavior, not a bundle
 
 Every agent must have:
 
-- A **specific role** stated in one sentence
-- A **defined tool set** — only the tools it needs
+- **One task** — describable in a single sentence without "and"
+- A **defined tool set** — only the tools needed for that one task
 - **Clear input/output contracts** — what it receives, what it returns
 - **No overlap** with other agents' responsibilities
+
+**Test:** If your agent description contains "and" (e.g., "parses logs **and** generates reports"), split it into two agents.
 
 **Before:**
 ```
 Agent: "general helper" — has all tools, handles everything
+  Result: mediocre at all tasks, picks wrong tools, bloated context
 ```
 **After:**
 ```
-Agent: "code reviewer" — receives a diff, returns structured feedback
+Agent 1: "code reviewer" — receives a diff, returns structured feedback
   Tools: read_file, grep, run_tests
   Input: { diff: string, context: string }
   Output: { issues: [{severity, file, line, message}], summary: string }
+
+Agent 2: "report generator" — receives review results, produces markdown report
+  Tools: write_file, format_markdown
+  Input: { issues: [...], summary: string }
+  Output: { report_path: string }
 ```
 
 ### Rule 3 — Choose an Orchestration Pattern
