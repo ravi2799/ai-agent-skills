@@ -344,21 +344,42 @@ When a tool fails, return a message the agent can act on — not a raw error.
 | `NoneType has no attribute 'get'` | `Customer not found for ID 'xyz'. Try searching by email instead using search_customers.` |
 | `TimeoutError` | `Database query timed out after 30s. Try narrowing the date range or adding filters.` |
 
-**10. Truncation with guidance — don't dump thousands of results**
+**10. Context-aware result sizing — don't dump AND don't lose signal**
 
-When a tool returns large result sets, truncate and tell the agent how to get more:
+Not all tools should handle large results the same way. The right strategy depends on whether the tool is for **discovery** (finding something) or **analysis** (reasoning over everything).
+
+| Tool Type | Strategy | Example |
+|---|---|---|
+| **Discovery** (searching, listing) | Truncate + guide to refine | `search_customers` → show top 25, suggest filters |
+| **Analysis** (examining, correlating) | Pre-filter, never truncate | `get_error_logs` → filter to relevant severity/time, return ALL matching |
+
+**For discovery tools** — truncate and tell the agent how to narrow down:
 
 ```python
-def format_results(results, limit=25):
+def format_search_results(results, limit=25):
     if len(results) > limit:
-        truncated = results[:limit]
         return (
-            format_entries(truncated)
+            format_entries(results[:limit])
             + f"\n\n[Showing {limit} of {len(results)} results. "
             + "Use filters or increase 'limit' for more targeted results.]"
         )
     return format_entries(results)
 ```
+
+**For analysis tools** — pre-filter by relevance, never truncate what remains:
+
+```python
+def get_error_logs(time_range: str, severity: str = "ERROR") -> str:
+    """Return ALL log entries matching the criteria.
+    Pre-filters by severity and time range to keep results
+    focused, but never truncates matching entries — every
+    line could contain the root cause."""
+    lines = load_logs(time_range)
+    filtered = [l for l in lines if severity in l]  # filter, not truncate
+    return format_entries(filtered)  # return ALL matches
+```
+
+**The key principle:** Filtering removes noise (safe). Truncating removes signal (dangerous). Use `context-engineer` to pre-filter data before it enters context, and design analysis tools that return everything relevant within their filtered scope.
 
 ### Tool Design Patterns
 
