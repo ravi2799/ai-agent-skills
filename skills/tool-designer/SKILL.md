@@ -233,6 +233,18 @@ tool_node = ToolNode(tools, handle_tool_errors=True)
 
 ### Core Design Rules (All Formats)
 
+**0. Consolidate — don't wrap APIs 1:1**
+
+Do NOT create a separate tool for every API endpoint. Consolidate multi-step workflows into single, task-oriented tools.
+
+| Bad (wrapping APIs) | Good (consolidating) |
+|---|---|
+| `list_users` + `list_events` + `create_event` | `schedule_event` (finds availability + schedules) |
+| `read_logs` (returns everything) | `search_logs` (returns only relevant lines with context) |
+| `get_customer_by_id` + `list_transactions` + `list_notes` | `get_customer_context` (compiles recent relevant info) |
+
+**Why:** Each tool call consumes context. A `list_contacts` returning thousands of entries wastes the agent's limited attention budget. Design tools that filter and return only what the agent needs.
+
 **1. Name — snake_case, verb_noun format, specific**
 | Weak | Strong |
 |---|---|
@@ -241,7 +253,15 @@ tool_node = ToolNode(tools, handle_tool_errors=True)
 | `process` | `parse_csv_to_json` |
 | `run` | `execute_sql_query` |
 
+**Namespacing** — when the agent has many tools from multiple services, use prefixes to prevent confusion:
+- By service: `asana_search_tasks`, `jira_search_issues`
+- By resource: `asana_projects_list`, `asana_users_search`
+
 **2. Description — what it does AND when to use it**
+
+Tool descriptions are **loaded into the agent's system prompt** — they are the highest-leverage text you can write. Even small refinements yield dramatic improvements.
+
+Write descriptions as if explaining to a new hire — make implicit context explicit, define niche terminology, describe resource relationships.
 
 The LLM reads the description to decide whether to call this tool. Include:
 - What the tool does (first sentence)
@@ -287,6 +307,58 @@ If a parameter accepts a fixed set of values, use `enum` (JSON Schema) or `Liter
 **6. Single responsibility — one tool, one action**
 
 If a tool does multiple unrelated things based on a "mode" parameter, split it into separate tools.
+
+**7. Use semantic identifiers — not UUIDs**
+
+Agents hallucinate arbitrary alphanumeric IDs. Use human-readable identifiers whenever possible.
+
+| Bad (agent hallucinates) | Good (agent reasons correctly) |
+|---|---|
+| `user: "a1b2c3d4-e5f6-..."` | `user_id: "jane.doe@company.com"` |
+| `file_id: "0x7f3a..."` | `file_path: "src/main.py"` |
+| Return raw UUIDs | Return names with IDs: `"Jane Doe (id: 123)"` |
+
+**8. Response format control — let the agent choose verbosity**
+
+Add a `response_format` parameter so the agent can request detailed or concise responses based on the task:
+
+```python
+@tool
+def search_customers(query: str, response_format: Literal["detailed", "concise"] = "concise") -> str:
+    """Search for customers by name or email.
+
+    Args:
+        query: Search term
+        response_format: 'detailed' for full profiles (~200 tokens each),
+                        'concise' for name + ID only (~20 tokens each)
+    """
+```
+
+**9. Actionable error responses — not stack traces**
+
+When a tool fails, return a message the agent can act on — not a raw error.
+
+| Bad | Good |
+|---|---|
+| `Error 400: Invalid parameter` | `Parameter 'date_range' must use format YYYY-MM-DD. Example: date_range='2025-01-01'` |
+| `NoneType has no attribute 'get'` | `Customer not found for ID 'xyz'. Try searching by email instead using search_customers.` |
+| `TimeoutError` | `Database query timed out after 30s. Try narrowing the date range or adding filters.` |
+
+**10. Truncation with guidance — don't dump thousands of results**
+
+When a tool returns large result sets, truncate and tell the agent how to get more:
+
+```python
+def format_results(results, limit=25):
+    if len(results) > limit:
+        truncated = results[:limit]
+        return (
+            format_entries(truncated)
+            + f"\n\n[Showing {limit} of {len(results)} results. "
+            + "Use filters or increase 'limit' for more targeted results.]"
+        )
+    return format_entries(results)
+```
 
 ### Tool Design Patterns
 
@@ -432,12 +504,50 @@ All other fields map directly. Wrap MCP `call_tool()` responses in `tool_result`
 
 ---
 
+## Operation: IMPROVE — Evaluation-Driven Tool Optimization
+
+### How to Improve Tools After Building
+
+1. **Run real-world evaluation tasks** — not simple ones like "search for X", but multi-step tasks like "Customer ID 9182 reported being charged three times. Find all relevant log entries and determine if other customers were affected."
+
+2. **Track these metrics per tool:**
+
+   | Metric | What It Reveals |
+   |---|---|
+   | Call count per task | Redundant calls → tool returns too little, needs pagination/filters |
+   | Error rate | Invalid params → description or naming is unclear |
+   | Tokens consumed | Large returns → needs truncation or response_format enum |
+   | Unused tools | Agent avoids it → description doesn't match mental model |
+
+3. **Analyze agent transcripts** — look for:
+   - Where the agent gets confused choosing between tools
+   - Redundant tool calls (suggests results aren't useful enough)
+   - Invalid parameter errors (suggests descriptions need clarity)
+   - The agent inventing parameters that don't exist (suggests missing functionality)
+
+4. **Use the agent itself to improve tools** — paste evaluation transcripts into the agent and ask it to identify tool description problems and suggest fixes.
+
+5. **Validate against a held-out test set** — don't just optimize for your training tasks. Use separate test tasks to ensure improvements generalize.
+
+### MCP Tool Annotations
+
+When creating MCP tools, use annotations to disclose behavior:
+- Mark tools that access external systems (open-world access)
+- Mark tools that make destructive or irreversible changes
+- This enables downstream guardrails and approval gates
+
+---
+
 ## What NOT To Do
 
 - Write a tool with no description or a one-word description
 - Create a "god tool" that handles multiple unrelated actions
+- Wrap every API endpoint as a separate tool — consolidate into task-oriented tools
 - Use `required` for parameters that have sensible defaults
 - Leave parameter descriptions empty
+- Return raw UUIDs or technical IDs — use semantic, human-readable identifiers
+- Return thousands of results without truncation or filtering
+- Return stack traces as errors — return actionable messages with examples
 - Copy tool definitions without verifying field name mappings
 - Add tools the agent will never need — fewer tools means better tool selection
 - Use reserved names (`config`, `runtime`) as tool parameter names in LangChain
