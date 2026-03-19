@@ -24,6 +24,7 @@ npx skills add ravi2799/ai-agent-skills --skill prompt-engineer
 | [eval-designer](skills/eval-designer/) | Build evaluation frameworks to measure agent quality |
 | [guardrails](skills/guardrails/) | Add safety rails, input validation, and output checks to agents |
 | [skill-creator](skills/skill-creator/) | Write new SKILL.md files that follow best practices |
+| [model-gateway](skills/model-gateway/) | Configure and call LLMs through OpenRouter, LiteLLM, or direct APIs |
 
 ## What Are Skills?
 
