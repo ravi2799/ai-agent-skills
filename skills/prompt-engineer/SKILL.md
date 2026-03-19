@@ -1,6 +1,15 @@
 ---
 name: prompt-engineer
-description: Use this skill whenever an agent needs to create, modify, rewrite, evaluate, or review any prompt. Triggers include: "write a prompt for...", "create a system prompt", "update this prompt", "improve this prompt", "rewrite the system prompt", "optimize this prompt", "change this prompt to...", "make this prompt better", "fix this prompt", "review this prompt", "is this a good prompt", "evaluate this prompt", or any task where the agent is about to write or edit a prompt string in code, config, or instructions. This skill enforces Anthropic's prompting best practices as mandatory rules for all prompt operations.
+description: >
+  Use this skill whenever an agent needs to create, modify, rewrite, evaluate,
+  or review any prompt. Triggers include "write a prompt for...",
+  "create a system prompt", "update this prompt", "improve this prompt",
+  "rewrite the system prompt", "optimize this prompt", "change this prompt to...",
+  "make this prompt better", "fix this prompt", "review this prompt",
+  "is this a good prompt", "evaluate this prompt", or any task where the agent
+  is about to write or edit a prompt string in code, config, or instructions.
+  This skill enforces Anthropic prompting best practices as mandatory rules
+  for all prompt operations.
 ---
 
 # Prompt Engineer Skill
